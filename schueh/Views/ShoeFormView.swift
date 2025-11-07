@@ -40,12 +40,21 @@ struct ShoeFormView: View {
                 }
 
                 Section("Target Mileage") {
-                    TextField(
-                        "Distance",
-                        value: $targetDistance,
-                        formatter: self.formatter
-                    )
-                    .keyboardType(.numberPad)
+                    HStack(spacing: 16) {
+                        TextField(
+                            "Distance",
+                            value: $targetDistance,
+                            formatter: self.formatter
+                        )
+                        .keyboardType(.numberPad)
+                        .alignmentGuide(.listRowSeparatorLeading) {
+                            $0[.leading]
+                        }
+
+                        Text("km")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
 
                     Text(
                         "Enter your target mileage for this shoe. As a rule of thumb, most running shoes aim for around 500 - 800 km."
@@ -81,7 +90,7 @@ struct ShoeFormView: View {
             }
             .alert("Delete Shoe", isPresented: $showingDeleteAlert) {
                 Button("Cancel", role: .cancel) {}
-                
+
                 Button("Delete", role: .destructive) {
                     dismiss()
                     onDelete?()

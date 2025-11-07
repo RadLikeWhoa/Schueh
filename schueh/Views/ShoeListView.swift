@@ -108,7 +108,7 @@ struct ShoeListView: View {
                 .searchable(
                     text: $searchQuery,
                     placement: .automatic,
-                    prompt: "Search shoes"
+                    prompt: "Search"
                 )
                 .textInputAutocapitalization(.never)
                 .contentMargins(.top, 16)
