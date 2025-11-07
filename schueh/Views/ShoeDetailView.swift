@@ -19,17 +19,6 @@ struct ShoeDetailView: View {
 
     var body: some View {
         List {
-            if shoe.archived {
-                Section {
-                    HStack(spacing: 8) {
-                        Image(systemName: "archivebox.fill")
-                        
-                        Text("This shoe has been archived.")
-                    }
-                    .listRowBackground(Color(red: 0.87, green: 0.81, blue: 0.81))
-                }
-            }
-            
             Section {
                 LabeledContent("Total Distance") {
                     Text("\(shoe.totalKilometers, specifier: "%.2f") km")
@@ -39,23 +28,62 @@ struct ShoeDetailView: View {
                     Text("\(shoe.targetDistance) km")
                 }
 
-                if shoe.remainder > 0 {
-                    LabeledContent("Remaining") {
-                        Text(
-                            "\(shoe.remainder, specifier: "%.2f") km • \(100 - shoe.progress, specifier: "%.2f")%"
-                        )
+                if !shoe.archived {
+                    if shoe.remainder > 0 {
+                        LabeledContent("Remaining") {
+                            Text(
+                                "\(shoe.remainder, specifier: "%.2f") km • \(100 - shoe.progress, specifier: "%.2f")%"
+                            )
+                        }
                     }
-                }
-
-                if let daysRemaining = shoe.daysRemaining {
-                    LabeledContent("Days Remaining") {
-                        Text(
-                            "^[\(daysRemaining) day](inflect: true)"
-                        )
+                    
+                    if let daysRemaining = shoe.daysRemaining {
+                        LabeledContent("Days Remaining") {
+                            Text(
+                                "^[\(daysRemaining) day](inflect: true)"
+                            )
+                        }
                     }
                 }
 
                 ShoeProgress(shoe: shoe)
+
+                if shoe.archived {
+                    HStack(spacing: 16) {
+                        Image(systemName: "archivebox.fill")
+                            .foregroundStyle(.gray)
+
+                        Text("This shoe has been archived.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    if shoe.hasExpired {
+                        HStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.red)
+
+                            Text(
+                                "This shoe has reached its mileage limit. Consider archiving it or looking for a replacement."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if shoe.closeToExpiration {
+                        HStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.yellow)
+
+                            Text(
+                                "This shoe is about to reach its mileage limit. Consider looking for a replacement."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                }
             }
 
             Section("Statistics") {
@@ -109,14 +137,18 @@ struct ShoeDetailView: View {
                     Button {
                         showingWorkoutPicker = true
                     } label: {
-                        Label("Assign Workouts", systemImage: "plus.circle.fill")
+                        Label(
+                            "Assign Workouts",
+                            systemImage: "plus.circle.fill"
+                        )
                     }
                 }
             }
 
             if !shoe.workouts.isEmpty {
                 Section("Assigned Workouts") {
-                    ForEach(shoe.workouts.sorted(by: { $0.date > $1.date })) { workout in
+                    ForEach(shoe.workouts.sorted(by: { $0.date > $1.date })) {
+                        workout in
                         WorkoutRow(workout: workout)
                     }
                 }
@@ -131,13 +163,14 @@ struct ShoeDetailView: View {
                 } label: {
                     Label(
                         shoe.archived ? "Unarchive Shoe" : "Archive Shoe",
-                        systemImage: shoe.archived ? "archivebox.fill" : "archivebox"
+                        systemImage: shoe.archived
+                            ? "archivebox.fill" : "archivebox"
                     )
                 }
             }
-            
+
             ToolbarSpacer(placement: .topBarTrailing)
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") {
                     showingEditSheet = true

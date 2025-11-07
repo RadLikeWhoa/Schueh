@@ -100,4 +100,12 @@ final class Shoe {
         guard averageKmPerWeek > 0 else { return nil }
         return Int(ceil(remainder / averageKmPerWeek * 7))
     }
+    
+    var hasExpired: Bool {
+        remainder <= 0
+    }
+    
+    var closeToExpiration: Bool {
+        progress > 80 && !hasExpired
+    }
 }

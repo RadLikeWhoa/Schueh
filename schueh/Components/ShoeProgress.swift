@@ -1,9 +1,51 @@
 import SwiftUI
 
 struct ShoeProgress: View {
-    let shoe: Shoe
+    var shoe: Shoe
+    
+    var color: Color {
+        if shoe.archived {
+            return .gray
+        }
+        
+        if shoe.hasExpired {
+            return .red
+        }
+        
+        if shoe.closeToExpiration {
+            return .yellow
+        }
+        
+        return .blue
+    }
+
+    private let capsule = Capsule()
 
     var body: some View {
-        ProgressView(value: shoe.progress)
+        ZStack(alignment: .center) {
+            capsule
+                .fill(.foreground.quaternary)
+                .overlay(alignment: .leading) {
+                    GeometryReader { proxy in
+                        capsule
+                            .fill(color)
+                            .frame(width: proxy.size.width * (shoe.progress / 100), height: 12)
+                        
+                    }
+                }
+                .frame(height: 12)
+                .clipShape(capsule)
+            
+            if shoe.archived || shoe.hasExpired || shoe.closeToExpiration {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.background)
+                    .frame(width: 32, height: 16)
+                
+                Image(systemName: shoe.archived ? "archivebox.fill" : "exclamationmark.triangle.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(color)
+            }
+        }
+        .frame(height: 16)
     }
 }
