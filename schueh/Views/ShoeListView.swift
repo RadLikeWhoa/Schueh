@@ -9,7 +9,7 @@ struct ShoeListView: View {
         sort: [SortDescriptor(\Shoe.created, order: .reverse)]
     )
     private var shoes: [Shoe]
-    
+
     @Query()
     private var allShoes: [Shoe]
 
@@ -19,6 +19,12 @@ struct ShoeListView: View {
     @State private var sortOption: ShoesSortOption = .daysRemaining
     @State private var showingAddSheet = false
     @State private var showingSortOptions = false
+    @State private var searchResults: [Shoe] = []
+    @State private var searchQuery = ""
+
+    var isSearching: Bool {
+        return !searchQuery.isEmpty
+    }
 
     private var sortedShoes: [Shoe] {
         var result = shoes
@@ -71,21 +77,40 @@ struct ShoeListView: View {
                 )
             } else {
                 List {
-                    ForEach(sortedShoes) { shoe in
-                        NavigationLink(
-                            destination:
-                                ShoeDetailView(shoe: shoe)
-                        ) {
-                            ShoeCard(shoe: shoe)
+                    if isSearching {
+                            ForEach(searchResults) { shoe in
+                                NavigationLink(
+                                    destination:
+                                        ShoeDetailView(shoe: shoe)
+                                ) {
+                                    ShoeCard(shoe: shoe)
+                                }
+                            }
+                    } else {
+                        ForEach(sortedShoes) { shoe in
+                            NavigationLink(
+                                destination:
+                                    ShoeDetailView(shoe: shoe)
+                            ) {
+                                ShoeCard(shoe: shoe)
+                            }
+                        }
+
+                        if allShoes.count > sortedShoes.count {
+                            NavigationLink(
+                                destination: ArchiveListView()
+                            ) {
+                                Text("Archived Shoes")
+                            }
                         }
                     }
-
-                    NavigationLink(
-                        destination: ArchiveListView()
-                    ) {
-                        Text("Archived Shoes")
-                    }
                 }
+                .searchable(
+                    text: $searchQuery,
+                    placement: .automatic,
+                    prompt: "Search shoes"
+                )
+                .textInputAutocapitalization(.never)
                 .contentMargins(.top, 16)
             }
         }
@@ -129,8 +154,24 @@ struct ShoeListView: View {
                 }
             }
         }
+        .overlay {
+            if isSearching && searchResults.isEmpty {
+                ContentUnavailableView(
+                    "No Shoes Found",
+                    systemImage: "shoe.fill",
+                    description: Text(
+                        "No shoes found for \"\(searchQuery)\"."
+                    )
+                )
+            }
+        }
         .sheet(isPresented: $showingAddSheet) {
             ShoeFormView()
+        }
+        .onChange(of: searchQuery) {
+            searchResults = shoes.filter { shoe in
+                shoe.name.lowercased().contains(searchQuery.lowercased())
+            }
         }
         .onAppear {
             sortOption =

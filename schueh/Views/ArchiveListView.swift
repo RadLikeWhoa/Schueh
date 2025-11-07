@@ -8,13 +8,18 @@ struct ArchiveListView: View {
         filter: #Predicate<Shoe> { $0.archived },
         sort: [SortDescriptor(\Shoe.created, order: .reverse)]
     )
-    
     private var shoes: [Shoe]
 
     @AppStorage("sortOption") private var storedSortOption: String = ArchiveSortOption.age.rawValue
     
     @State private var sortOption: ArchiveSortOption = .age
     @State private var showingSortOptions = false
+    @State private var searchResults: [Shoe] = []
+    @State private var searchQuery = ""
+    
+    var isSearching: Bool {
+        return !searchQuery.isEmpty
+    }
 
     private var sortedShoes: [Shoe] {
         var result = shoes
@@ -47,15 +52,32 @@ struct ArchiveListView: View {
                 )
             } else {
                 List {
-                    ForEach(sortedShoes) { shoe in
-                        NavigationLink(
-                            destination:
-                                ShoeDetailView(shoe: shoe)
-                        ) {
-                            ShoeCard(shoe: shoe)
+                    if isSearching {
+                            ForEach(searchResults) { shoe in
+                                NavigationLink(
+                                    destination:
+                                        ShoeDetailView(shoe: shoe)
+                                ) {
+                                    ShoeCard(shoe: shoe)
+                                }
+                            }
+                    } else {
+                        ForEach(sortedShoes) { shoe in
+                            NavigationLink(
+                                destination:
+                                    ShoeDetailView(shoe: shoe)
+                            ) {
+                                ShoeCard(shoe: shoe)
+                            }
                         }
                     }
                 }
+                .searchable(
+                    text: $searchQuery,
+                    placement: .automatic,
+                    prompt: "Search shoes"
+                )
+                .textInputAutocapitalization(.never)
                 .contentMargins(.top, 16)
             }
         }
@@ -83,6 +105,22 @@ struct ArchiveListView: View {
                         Label("Sort", systemImage: "arrow.up.arrow.down")
                     }
                 }
+            }
+        }
+        .overlay {
+            if isSearching && searchResults.isEmpty {
+                ContentUnavailableView(
+                    "No Shoes Found",
+                    systemImage: "shoe.fill",
+                    description: Text(
+                        "No shoes found for \"\(searchQuery)\"."
+                    )
+                )
+            }
+        }
+        .onChange(of: searchQuery) {
+            searchResults = shoes.filter { shoe in
+                shoe.name.lowercased().contains(searchQuery.lowercased())
             }
         }
         .onAppear {
