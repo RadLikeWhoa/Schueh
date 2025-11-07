@@ -4,7 +4,7 @@ struct ShoeProgress: View {
     var shoe: Shoe
     
     var color: Color {
-        if shoe.archived {
+        if shoe.isArchived {
             return .gray
         }
         
@@ -36,12 +36,12 @@ struct ShoeProgress: View {
                 .frame(height: 12)
                 .clipShape(capsule)
             
-            if shoe.archived || shoe.hasExpired || shoe.closeToExpiration {
+            if shoe.isArchived || shoe.hasExpired || shoe.closeToExpiration {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(.background)
                     .frame(width: 32, height: 16)
                 
-                Image(systemName: shoe.archived ? "archivebox.fill" : "exclamationmark.triangle.fill")
+                Image(systemName: shoe.isArchived ? "archivebox.fill" : "exclamationmark.triangle.fill")
                     .font(.system(size: 16))
                     .foregroundStyle(color)
             }

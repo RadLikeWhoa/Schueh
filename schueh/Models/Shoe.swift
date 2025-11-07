@@ -7,9 +7,9 @@ final class Shoe {
     var name: String
     var color: String?
     var created: Date
-    var purchased: Date?
+    var purchased: Date
     var targetDistance: Int
-    var archived: Bool
+    var archived: Date?
 
     @Relationship(deleteRule: .cascade)
     var workouts: [WorkoutRecord] = []
@@ -17,10 +17,10 @@ final class Shoe {
     init(
         name: String,
         targetDistance: Int,
-        archived: Bool,
+        archived: Date? = nil,
         version: String? = nil,
         color: String? = nil,
-        purchased: Date? = nil,
+        purchased: Date,
     ) {
         self.id = UUID()
         self.name = name
@@ -53,7 +53,7 @@ final class Shoe {
             Calendar.current.dateComponents(
                 [.weekOfYear],
                 from: firstWorkout.date,
-                to: Date()
+                to: archived ?? Date()
             ).weekOfYear ?? 1
 
         guard weeksSinceFirst > 0 else { return totalKilometers }
@@ -62,12 +62,10 @@ final class Shoe {
     }
     
     var age: Int? {
-        guard let purchased else { return nil }
-        
         return Calendar.current.dateComponents(
             [.day],
             from: purchased,
-            to: Date()
+            to: archived ?? Date()
         ).day
     }
 
@@ -107,5 +105,9 @@ final class Shoe {
     
     var closeToExpiration: Bool {
         progress > 80 && !hasExpired
+    }
+    
+    var isArchived: Bool {
+        archived != nil
     }
 }

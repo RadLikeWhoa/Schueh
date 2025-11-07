@@ -28,7 +28,7 @@ struct ShoeDetailView: View {
                     Text("\(shoe.targetDistance) km")
                 }
 
-                if !shoe.archived {
+                if !shoe.isArchived {
                     if shoe.remainder > 0 {
                         LabeledContent("Remaining") {
                             Text(
@@ -36,7 +36,7 @@ struct ShoeDetailView: View {
                             )
                         }
                     }
-                    
+
                     if let daysRemaining = shoe.daysRemaining {
                         LabeledContent("Days Remaining") {
                             Text(
@@ -48,7 +48,7 @@ struct ShoeDetailView: View {
 
                 ShoeProgress(shoe: shoe)
 
-                if shoe.archived {
+                if shoe.isArchived {
                     HStack(spacing: 16) {
                         Image(systemName: "archivebox.fill")
                             .foregroundStyle(.gray)
@@ -112,27 +112,23 @@ struct ShoeDetailView: View {
                 }
             }
 
-            if shoe.color != nil || shoe.purchased != nil || shoe.age != nil {
-                Section("Details") {
-                    if let color = shoe.color {
-                        LabeledContent("Color", value: color)
-                    }
+            Section("Details") {
+                if let color = shoe.color {
+                    LabeledContent("Color", value: color)
+                }
 
-                    if let purchased = shoe.purchased {
-                        LabeledContent("Purchased") {
-                            Text("\(dateFormatter.string(from: purchased))")
-                        }
-                    }
+                LabeledContent("Purchased") {
+                    Text("\(dateFormatter.string(from: shoe.purchased))")
+                }
 
-                    if let age = shoe.age {
-                        LabeledContent("Age") {
-                            Text("^[\(age) day](inflect: true)")
-                        }
+                if let age = shoe.age {
+                    LabeledContent("Age") {
+                        Text("^[\(age) day](inflect: true)")
                     }
                 }
             }
 
-            if !shoe.archived {
+            if !shoe.isArchived {
                 Section {
                     Button {
                         showingWorkoutPicker = true
@@ -162,8 +158,8 @@ struct ShoeDetailView: View {
                     viewModel?.toggleArchive()
                 } label: {
                     Label(
-                        shoe.archived ? "Unarchive Shoe" : "Archive Shoe",
-                        systemImage: shoe.archived
+                        shoe.isArchived ? "Unarchive Shoe" : "Archive Shoe",
+                        systemImage: shoe.isArchived
                             ? "archivebox.fill" : "archivebox"
                     )
                 }

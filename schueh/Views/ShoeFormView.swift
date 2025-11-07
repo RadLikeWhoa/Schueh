@@ -8,7 +8,7 @@ struct ShoeFormView: View {
     @State private var name = ""
     @State private var color = ""
     @State private var targetDistance: Int?
-    @State private var purchased: Date?
+    @State private var purchased = Date()
     @State private var showingDeleteAlert = false
 
     var existingShoe: Shoe?
@@ -31,7 +31,7 @@ struct ShoeFormView: View {
                     DatePicker(
                         "Purchased",
                         selection: Binding<Date>(
-                            get: { self.purchased ?? Date() },
+                            get: { self.purchased },
                             set: { self.purchased = $0 }
                         ),
                         in: Date.distantPast...Date(),
@@ -121,7 +121,7 @@ struct ShoeFormView: View {
             let shoe = Shoe(
                 name: name,
                 targetDistance: targetDistance ?? 0,
-                archived: false,
+                archived: nil,
                 color: color.isEmpty ? nil : color,
                 purchased: purchased
             )

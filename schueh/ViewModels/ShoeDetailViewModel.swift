@@ -71,7 +71,7 @@ class ShoeDetailViewModel {
             try repository.toggleArchive(shoe)
         } catch {
             errorMessage =
-            "Failed to \(shoe.archived ? "unarchive" : "archive") shoe: \(error.localizedDescription)"
+            "Failed to \(shoe.isArchived ? "unarchive" : "archive") shoe: \(error.localizedDescription)"
         }
     }
 }

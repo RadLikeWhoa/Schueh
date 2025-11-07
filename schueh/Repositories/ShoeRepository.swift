@@ -28,7 +28,7 @@ class ShoeRepository {
     }
     
     func toggleArchive(_ shoe: Shoe) throws {
-        shoe.archived = !shoe.archived
+        shoe.archived = shoe.isArchived ? nil : Date()
         try modelContext.save()
     }
 

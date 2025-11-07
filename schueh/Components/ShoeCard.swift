@@ -25,7 +25,7 @@ struct ShoeCard: View {
                     "\(shoe.progress, specifier: "%.1f")%"
                 )
                 
-                if !shoe.archived {
+                if !shoe.isArchived {
                     if let daysRemaining = shoe.daysRemaining {
                         Text("•")
                         

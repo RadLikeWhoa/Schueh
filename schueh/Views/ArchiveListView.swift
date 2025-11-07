@@ -5,7 +5,7 @@ struct ArchiveListView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Query(
-        filter: #Predicate<Shoe> { $0.archived },
+        filter: #Predicate<Shoe> { $0.isArchived },
         sort: [SortDescriptor(\Shoe.created, order: .reverse)]
     )
     private var shoes: [Shoe]
@@ -27,11 +27,7 @@ struct ArchiveListView: View {
 
         switch sortOption {
         case .age:
-            result.sort { shoe1, shoe2 in
-                guard let date1 = shoe1.purchased else { return false }
-                guard let date2 = shoe2.purchased else { return true }
-                return date1 < date2
-            }
+            result.sort { $0.purchased < $1.purchased }
 
         case .name:
             result.sort { $0.name < $1.name }
