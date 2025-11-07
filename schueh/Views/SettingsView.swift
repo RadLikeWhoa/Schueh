@@ -6,20 +6,19 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Appearance") {
-                Picker(selection: $appearanceSelection) {
-                    Text("System")
-                        .tag(0)
-                    Text("Light")
-                        .tag(1)
-                    Text("Dark")
-                        .tag(2)
-                } label: {
-                    Text("Theme")
-                }
-                .pickerStyle(.menu)
+            Picker(selection: $appearanceSelection) {
+                Text("System")
+                    .tag(0)
+                Text("Light")
+                    .tag(1)
+                Text("Dark")
+                    .tag(2)
+            } label: {
+                Text("Appearance")
             }
+            .pickerStyle(.menu)
         }
+        .contentMargins(.top, 16)
         .navigationTitle("Settings")
     }
 }

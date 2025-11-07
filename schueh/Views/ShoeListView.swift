@@ -114,6 +114,7 @@ struct ShoeListView: View {
                 .contentMargins(.top, 16)
             }
         }
+        .navigationTitle("Shoes")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationLink(destination: SettingsView()) {

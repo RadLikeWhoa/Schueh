@@ -19,7 +19,18 @@ struct ShoeDetailView: View {
 
     var body: some View {
         List {
-            Section("Progress") {
+            if shoe.archived {
+                Section {
+                    HStack(spacing: 8) {
+                        Image(systemName: "archivebox.fill")
+                        
+                        Text("This shoe has been archived.")
+                    }
+                    .listRowBackground(Color(red: 0.87, green: 0.81, blue: 0.81))
+                }
+            }
+            
+            Section {
                 LabeledContent("Total Distance") {
                     Text("\(shoe.totalKilometers, specifier: "%.2f") km")
                 }
@@ -93,11 +104,13 @@ struct ShoeDetailView: View {
                 }
             }
 
-            Section {
-                Button {
-                    showingWorkoutPicker = true
-                } label: {
-                    Label("Assign Workouts", systemImage: "plus.circle.fill")
+            if !shoe.archived {
+                Section {
+                    Button {
+                        showingWorkoutPicker = true
+                    } label: {
+                        Label("Assign Workouts", systemImage: "plus.circle.fill")
+                    }
                 }
             }
 
@@ -109,6 +122,7 @@ struct ShoeDetailView: View {
                 }
             }
         }
+        .contentMargins(.top, 16)
         .navigationTitle(shoe.name)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -117,7 +131,7 @@ struct ShoeDetailView: View {
                 } label: {
                     Label(
                         shoe.archived ? "Unarchive Shoe" : "Archive Shoe",
-                        systemImage: "archivebox.fill"
+                        systemImage: shoe.archived ? "archivebox.fill" : "archivebox"
                     )
                 }
             }

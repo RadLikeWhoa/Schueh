@@ -20,8 +20,8 @@ struct ShoeTrackerApp: App {
         WindowGroup {
             NavigationStack {
                 ShoeListView()
+                    .navigationBarTitleDisplayMode(.inline)
             }
-            .navigationBarTitleDisplayMode(.inline)
             .preferredColorScheme(appearanceSwitch)
         }
         .modelContainer(for: [Shoe.self, WorkoutRecord.self])
