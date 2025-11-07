@@ -56,6 +56,7 @@ struct ArchiveListView: View {
                         }
                     }
                 }
+                .contentMargins(.top, 16)
             }
         }
         .navigationTitle("Archive")

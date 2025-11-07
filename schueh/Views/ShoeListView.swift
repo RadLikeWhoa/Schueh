@@ -8,8 +8,10 @@ struct ShoeListView: View {
         filter: #Predicate<Shoe> { !$0.archived },
         sort: [SortDescriptor(\Shoe.created, order: .reverse)]
     )
-
     private var shoes: [Shoe]
+    
+    @Query()
+    private var allShoes: [Shoe]
 
     @AppStorage("sortOption") private var storedSortOption: String =
         ShoesSortOption.daysRemaining.rawValue
@@ -59,7 +61,7 @@ struct ShoeListView: View {
 
     var body: some View {
         Group {
-            if sortedShoes.isEmpty {
+            if allShoes.isEmpty {
                 ContentUnavailableView(
                     "No Shoes",
                     systemImage: "shoe.fill",
