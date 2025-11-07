@@ -121,7 +121,7 @@ struct ShoeListView: View {
                 }
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Menu {
                     Picker(
                         "Sort By",
@@ -144,9 +144,7 @@ struct ShoeListView: View {
                 } label: {
                     Label("Sort", systemImage: "arrow.up.arrow.down")
                 }
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
+                
                 Button {
                     showingAddSheet = true
                 } label: {

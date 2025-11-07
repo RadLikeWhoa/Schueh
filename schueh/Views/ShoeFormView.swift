@@ -9,8 +9,10 @@ struct ShoeFormView: View {
     @State private var color = ""
     @State private var targetDistance: Int?
     @State private var purchased: Date?
+    @State private var showingDeleteAlert = false
 
     var existingShoe: Shoe?
+    var onDelete: (() -> Void)?
 
     private let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -23,7 +25,9 @@ struct ShoeFormView: View {
             Form {
                 Section("Details") {
                     TextField("Name", text: $name)
+
                     TextField("Color", text: $color)
+
                     DatePicker(
                         "Purchased",
                         selection: Binding<Date>(
@@ -34,12 +38,20 @@ struct ShoeFormView: View {
                         displayedComponents: [.date]
                     )
                 }
-                Section("Target Distance") {
+
+                Section("Target Mileage") {
                     TextField(
                         "Distance",
                         value: $targetDistance,
                         formatter: self.formatter
-                    ).keyboardType(.numberPad)
+                    )
+                    .keyboardType(.numberPad)
+
+                    Text(
+                        "Enter your target mileage for this shoe. As a rule of thumb, most running shoes aim for around 500 - 800 km."
+                    )
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle(existingShoe == nil ? "Add Shoe" : "Edit Shoe")
@@ -50,12 +62,34 @@ struct ShoeFormView: View {
                         dismiss()
                     }
                 }
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", systemImage: "checkmark") {
                         saveShoe()
                     }
                     .disabled(name.isEmpty || targetDistance == nil)
                 }
+
+                if existingShoe != nil {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Delete Shoe", role: .destructive) {
+                            showingDeleteAlert = true
+                        }
+                        .foregroundStyle(.red)
+                    }
+                }
+            }
+            .alert("Delete Shoe", isPresented: $showingDeleteAlert) {
+                Button("Cancel", role: .cancel) {}
+                
+                Button("Delete", role: .destructive) {
+                    dismiss()
+                    onDelete?()
+                }
+            } message: {
+                Text(
+                    "Are you sure you want to delete this shoe? This will also unassign all workouts from this shoe."
+                )
             }
             .onAppear {
                 if let shoe = existingShoe {

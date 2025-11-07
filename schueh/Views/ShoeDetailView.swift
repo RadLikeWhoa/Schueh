@@ -10,7 +10,6 @@ struct ShoeDetailView: View {
     @State private var viewModel: ShoeDetailViewModel?
     @State private var showingWorkoutPicker = false
     @State private var showingEditSheet = false
-    @State private var showingDeleteAlert = false
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -113,31 +112,21 @@ struct ShoeDetailView: View {
         .navigationTitle(shoe.name)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Edit") {
-                    showingEditSheet = true
+                Button {
+                    viewModel?.toggleArchive()
+                } label: {
+                    Label(
+                        shoe.archived ? "Unarchive Shoe" : "Archive Shoe",
+                        systemImage: "archivebox.fill"
+                    )
                 }
             }
             
             ToolbarSpacer(placement: .topBarTrailing)
             
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button {
-                        viewModel?.toggleArchive()
-                    } label: {
-                        Label(
-                            shoe.archived ? "Unarchive Shoe" : "Archive Shoe",
-                            systemImage: "archivebox.fill"
-                        )
-                    }
-
-                    Button(role: .destructive) {
-                        showingDeleteAlert = true
-                    } label: {
-                        Label("Delete", systemImage: "xmark")
-                    }
-                } label: {
-                    Label("More", systemImage: "ellipsis")
+                Button("Edit") {
+                    showingEditSheet = true
                 }
             }
         }
@@ -145,20 +134,12 @@ struct ShoeDetailView: View {
             WorkoutPickerView(viewModel: viewModel)
         }
         .sheet(isPresented: $showingEditSheet) {
-            ShoeFormView(existingShoe: shoe)
-        }
-        .alert("Delete Shoe", isPresented: $showingDeleteAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
+            ShoeFormView(existingShoe: shoe) {
                 if let viewModel = viewModel {
                     viewModel.deleteShoe()
                     dismiss()
                 }
             }
-        } message: {
-            Text(
-                "Are you sure you want to delete this shoe? This will also unassign all workouts from this shoe."
-            )
         }
         .onAppear {
             if viewModel == nil {

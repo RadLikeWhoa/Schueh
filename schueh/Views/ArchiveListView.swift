@@ -10,20 +10,21 @@ struct ArchiveListView: View {
     )
     private var shoes: [Shoe]
 
-    @AppStorage("sortOption") private var storedSortOption: String = ArchiveSortOption.age.rawValue
-    
+    @AppStorage("sortOption") private var storedSortOption: String =
+        ArchiveSortOption.age.rawValue
+
     @State private var sortOption: ArchiveSortOption = .age
     @State private var showingSortOptions = false
     @State private var searchResults: [Shoe] = []
     @State private var searchQuery = ""
-    
+
     var isSearching: Bool {
         return !searchQuery.isEmpty
     }
 
     private var sortedShoes: [Shoe] {
         var result = shoes
-        
+
         switch sortOption {
         case .age:
             result.sort { shoe1, shoe2 in
@@ -38,7 +39,7 @@ struct ArchiveListView: View {
         case .totalDistance:
             result.sort { $0.totalKilometers > $1.totalKilometers }
         }
-        
+
         return result
     }
 
@@ -53,14 +54,14 @@ struct ArchiveListView: View {
             } else {
                 List {
                     if isSearching {
-                            ForEach(searchResults) { shoe in
-                                NavigationLink(
-                                    destination:
-                                        ShoeDetailView(shoe: shoe)
-                                ) {
-                                    ShoeCard(shoe: shoe)
-                                }
+                        ForEach(searchResults) { shoe in
+                            NavigationLink(
+                                destination:
+                                    ShoeDetailView(shoe: shoe)
+                            ) {
+                                ShoeCard(shoe: shoe)
                             }
+                        }
                     } else {
                         ForEach(sortedShoes) { shoe in
                             NavigationLink(
@@ -84,26 +85,27 @@ struct ArchiveListView: View {
         .navigationTitle("Archive")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 12) {
-                    Menu {
-                        Picker(
-                            "Sort By",
-                            selection: Binding(
-                                get: { sortOption },
-                                set: {
-                                    sortOption = $0
-                                    storedSortOption = $0.rawValue
-                                }
-                            )
-                        ) {
-                            ForEach(ArchiveSortOption.allCases) { option in
-                                Label(option.rawValue, systemImage: option.systemImage)
-                                    .tag(option)
+                Menu {
+                    Picker(
+                        "Sort By",
+                        selection: Binding(
+                            get: { sortOption },
+                            set: {
+                                sortOption = $0
+                                storedSortOption = $0.rawValue
                             }
+                        )
+                    ) {
+                        ForEach(ArchiveSortOption.allCases) { option in
+                            Label(
+                                option.rawValue,
+                                systemImage: option.systemImage
+                            )
+                            .tag(option)
                         }
-                    } label: {
-                        Label("Sort", systemImage: "arrow.up.arrow.down")
                     }
+                } label: {
+                    Label("Sort", systemImage: "arrow.up.arrow.down")
                 }
             }
         }

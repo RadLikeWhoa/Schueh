@@ -20,10 +20,6 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("Settings")
-            }
-        }
+        .navigationTitle("Settings")
     }
 }
