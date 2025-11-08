@@ -92,8 +92,11 @@ struct ShoeFormView: View {
                 Button("Cancel", role: .cancel) {}
 
                 Button("Delete", role: .destructive) {
-                    dismiss()
-                    onDelete?()
+                    do {
+                        try delete()
+                        dismiss()
+                        onDelete?()
+                    } catch {}
                 }
             } message: {
                 Text(
@@ -109,6 +112,13 @@ struct ShoeFormView: View {
                 }
             }
         }
+    }
+    
+   private func delete() throws {
+       guard let shoe = existingShoe else { return }
+       
+       modelContext.delete(shoe)
+       try modelContext.save()
     }
 
     private func saveShoe() {

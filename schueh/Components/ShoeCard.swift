@@ -7,7 +7,7 @@ struct ShoeCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(shoe.name)
                 .font(.headline)
-            
+
             if let color = shoe.color {
                 Text(color)
                     .font(.subheadline)
@@ -18,24 +18,28 @@ struct ShoeCard: View {
                 Text(
                     "\(shoe.totalKilometers, specifier: "%.1f") km"
                 )
-                
+
                 Text("•")
-                
+
                 Text(
                     "\(shoe.progress, specifier: "%.1f")%"
                 )
-                
+
                 if !shoe.isArchived {
                     if let daysRemaining = shoe.daysRemaining {
                         Text("•")
-                        
-                        Text("^[\(daysRemaining) day](inflect: true) remaining")
+
+                        Text(
+                            daysRemaining > 365
+                                ? "> 1 year"
+                                : "^[\(daysRemaining) day](inflect: true)"
+                        )
                     }
                 }
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
-            
+
             ShoeProgress(shoe: shoe)
                 .padding(.top, 4)
         }

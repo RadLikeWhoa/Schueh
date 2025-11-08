@@ -9,19 +9,6 @@ class ShoeRepository {
         self.modelContext = modelContext
     }
 
-    func fetchAllShoes() -> [Shoe] {
-        let descriptor = FetchDescriptor<Shoe>(sortBy: [
-            SortDescriptor(\.created, order: .reverse)
-        ])
-        
-        return (try? modelContext.fetch(descriptor)) ?? []
-    }
-
-    func save(_ shoe: Shoe) throws {
-        modelContext.insert(shoe)
-        try modelContext.save()
-    }
-
     func delete(_ shoe: Shoe) throws {
         modelContext.delete(shoe)
         try modelContext.save()
@@ -60,5 +47,17 @@ class ShoeRepository {
         }
 
         try modelContext.save()
+    }
+    
+    func removeWorkout(
+        _ workout: WorkoutRecord
+    ) throws {
+        modelContext.delete(workout)
+        try modelContext.save()
+    }
+    
+    func allAssignedHealthKitIds() throws -> Set<UUID> {
+        let workouts = try modelContext.fetch(FetchDescriptor<WorkoutRecord>())
+        return Set(workouts.map { $0.healthKitId })
     }
 }

@@ -5,7 +5,7 @@ struct ShoeListView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Query(
-        filter: #Predicate<Shoe> { $0.archived != nil },
+        filter: #Predicate<Shoe> { $0.archived == nil },
         sort: [SortDescriptor(\Shoe.created, order: .reverse)]
     )
     private var shoes: [Shoe]

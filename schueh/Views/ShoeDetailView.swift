@@ -128,24 +128,24 @@ struct ShoeDetailView: View {
                 }
             }
 
-            if !shoe.isArchived {
-                Section {
-                    Button {
-                        showingWorkoutPicker = true
-                    } label: {
-                        Label(
-                            "Assign Workouts",
-                            systemImage: "plus.circle.fill"
-                        )
-                    }
-                }
-            }
-
             if !shoe.workouts.isEmpty {
-                Section("Assigned Workouts") {
-                    ForEach(shoe.workouts.sorted(by: { $0.date > $1.date })) {
+                Section("Workouts") {
+                    ForEach(
+                        shoe.workouts.sorted(by: { $0.date > $1.date }).prefix(
+                            3
+                        )
+                    ) {
                         workout in
                         WorkoutRow(workout: workout)
+                    }
+
+                    if shoe.workouts.count > 3 {
+                        NavigationLink(
+                            destination:
+                                WorkoutsView(shoe: shoe)
+                        ) {
+                            Text("Show All Workouts")
+                        }
                     }
                 }
             }
@@ -172,16 +172,21 @@ struct ShoeDetailView: View {
                     showingEditSheet = true
                 }
             }
+
+            if !shoe.isArchived {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Assign Workouts") {
+                        showingWorkoutPicker = true
+                    }
+                }
+            }
         }
         .sheet(isPresented: $showingWorkoutPicker) {
             WorkoutPickerView(viewModel: viewModel)
         }
         .sheet(isPresented: $showingEditSheet) {
             ShoeFormView(existingShoe: shoe) {
-                if let viewModel = viewModel {
-                    viewModel.deleteShoe()
-                    dismiss()
-                }
+                dismiss()
             }
         }
         .onAppear {

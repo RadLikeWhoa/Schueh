@@ -31,8 +31,11 @@ class ShoeDetailViewModel {
         do {
             try await healthKitManager.requestAuthorization()
 
-            availableWorkouts =
-                try await healthKitManager.fetchRunningWorkouts()
+            let assignedIds = try repository.allAssignedHealthKitIds()
+            let allWorkouts = try await healthKitManager.fetchRunningWorkouts()
+            
+            availableWorkouts = allWorkouts.filter { !assignedIds.contains($0.uuid) }
+
         } catch {
             errorMessage =
                 "Failed to load workouts: \(error.localizedDescription)"
@@ -54,15 +57,6 @@ class ShoeDetailViewModel {
         } catch {
             errorMessage =
                 "Failed to assign workout: \(error.localizedDescription)"
-        }
-    }
-    
-    func deleteShoe() {
-        do {
-            try repository.delete(shoe)
-        } catch {
-            errorMessage =
-                "Failed to delete shoe: \(error.localizedDescription)"
         }
     }
     
