@@ -1,42 +1,49 @@
 import HealthKit
 import SwiftUI
+import SwiftData
 
 struct WorkoutPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
+    let shoe: Shoe
+
     @State private var selection = Set<HKWorkout>()
+    @State private var viewModel: WorkoutPickerViewModel
 
-    let shoeViewModel: ShoeDetailViewModel?
-
-    init(viewModel: ShoeDetailViewModel?) {
-        self.shoeViewModel = viewModel
+    init(shoe: Shoe, modelContext: ModelContext) {
+        self.shoe = shoe
+        
+        _viewModel = State(
+            initialValue: WorkoutPickerViewModel(
+                shoe: shoe,
+                repository: ShoeRepository(modelContext: modelContext),
+                healthKitManager: HealthKitManager()
+            )
+        )
     }
 
     var body: some View {
         NavigationStack {
             Group {
-                if let viewModel = shoeViewModel {
-                    if viewModel.isLoading {
-                        ProgressView("Loading workouts...")
-                    } else if viewModel.availableWorkouts.isEmpty {
-                        ContentUnavailableView(
-                            "No Workouts Found",
-                            systemImage: "figure.run",
-                            description: Text(
-                                "No running workouts found in Apple Health."
-                            )
+                if viewModel.isLoading {
+                    ProgressView("Loading workouts...")
+                } else if viewModel.availableWorkouts.isEmpty {
+                    ContentUnavailableView(
+                        "No Workouts Found",
+                        systemImage: "figure.run",
+                        description: Text(
+                            "No running workouts found in Apple Health."
                         )
-                    } else {
-                        List(
-                            viewModel.availableWorkouts,
-                            id: \.self,
-                            selection: $selection
-                        ) {
-                            workout in
-                            WorkoutPickerRow(workout: workout)
-                        }
-                        .environment(\.editMode, .constant(EditMode.active))
+                    )
+                } else {
+                    List(
+                        viewModel.availableWorkouts,
+                        id: \.self,
+                        selection: $selection
+                    ) { workout in
+                        WorkoutPickerRow(workout: workout)
                     }
+                    .environment(\.editMode, .constant(EditMode.active))
                 }
             }
             .contentMargins(.top, 16)
@@ -52,27 +59,24 @@ struct WorkoutPickerView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", systemImage: "checkmark") {
                         selection.forEach { workout in
-                            shoeViewModel?.assignWorkout(workout)
+                            viewModel.assignWorkout(workout)
                         }
-                        
                         dismiss()
                     }
                     .disabled(selection.isEmpty)
                 }
 
-                if let viewModel = shoeViewModel {
-                    if !viewModel.availableWorkouts.isEmpty {
-                        ToolbarItem(placement: .bottomBar) {
-                            if viewModel.availableWorkouts.count == selection.count
-                            {
-                                Button("Deselect All") {
-                                    selection.removeAll()
-                                }
-                            } else {
-                                Button("Select All") {
-                                    viewModel.availableWorkouts.forEach { workout in
-                                        selection.insert(workout)
-                                    }
+                if !viewModel.availableWorkouts.isEmpty {
+                    ToolbarItem(placement: .bottomBar) {
+                        if viewModel.availableWorkouts.count == selection.count {
+                            Button("Deselect All") {
+                                selection.removeAll()
+                            }
+                        } else {
+                            Button("Select All") {
+                                viewModel.availableWorkouts.forEach {
+                                    workout in
+                                    selection.insert(workout)
                                 }
                             }
                         }
@@ -81,7 +85,7 @@ struct WorkoutPickerView: View {
             }
         }
         .task {
-            await shoeViewModel?.loadAvailableWorkouts()
+            await viewModel.loadAvailableWorkouts()
         }
     }
 }

@@ -74,19 +74,25 @@ struct ShoeListView: View {
             } else {
                 List {
                     if isSearching {
-                            ForEach(searchResults) { shoe in
-                                NavigationLink(
-                                    destination:
-                                        ShoeDetailView(shoe: shoe)
-                                ) {
-                                    ShoeCard(shoe: shoe)
-                                }
+                        ForEach(searchResults) { shoe in
+                            NavigationLink(
+                                destination:
+                                    ShoeDetailView(
+                                        shoe: shoe,
+                                        modelContext: modelContext
+                                    )
+                            ) {
+                                ShoeCard(shoe: shoe)
                             }
+                        }
                     } else {
                         ForEach(sortedShoes) { shoe in
                             NavigationLink(
                                 destination:
-                                    ShoeDetailView(shoe: shoe)
+                                    ShoeDetailView(
+                                        shoe: shoe,
+                                        modelContext: modelContext
+                                    )
                             ) {
                                 ShoeCard(shoe: shoe)
                             }
@@ -141,7 +147,7 @@ struct ShoeListView: View {
                 } label: {
                     Label("Sort", systemImage: "arrow.up.arrow.down")
                 }
-                
+
                 Button {
                     showingAddSheet = true
                 } label: {

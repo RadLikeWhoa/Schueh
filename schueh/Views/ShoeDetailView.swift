@@ -7,15 +7,46 @@ struct ShoeDetailView: View {
 
     let shoe: Shoe
 
-    @State private var viewModel: ShoeDetailViewModel?
-    @State private var showingWorkoutPicker = false
-    @State private var showingEditSheet = false
+    @State private var viewModel: ShoeDetailViewModel
+
+    enum ActiveSheet: Identifiable {
+        case workoutPicker, editSheet
+
+        var id: Int {
+            switch self {
+            case .workoutPicker:
+                return 0
+
+            case .editSheet:
+                return 1
+            }
+        }
+    }
+
+    @State private var activeSheet: ActiveSheet?
+
+    private var recentWorkouts: ArraySlice<WorkoutRecord> {
+        shoe.workouts.sorted(by: { $0.date > $1.date }).prefix(
+            3
+        )
+    }
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter
     }()
+
+    init(shoe: Shoe, modelContext: ModelContext) {
+        self.shoe = shoe
+
+        _viewModel = State(
+            initialValue: ShoeDetailViewModel(
+                shoe: shoe,
+                repository: ShoeRepository(modelContext: modelContext)
+            )
+        )
+    }
 
     var body: some View {
         List {
@@ -53,10 +84,12 @@ struct ShoeDetailView: View {
                         HStack(spacing: 16) {
                             Image(systemName: "archivebox.fill")
                                 .foregroundStyle(.gray)
-                            
-                            Text("This shoe was archived on \(dateFormatter.string(from: archived)).")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+
+                            Text(
+                                "This shoe was archived on \(dateFormatter.string(from: archived))."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                         }
                     }
                 } else {
@@ -132,16 +165,11 @@ struct ShoeDetailView: View {
 
             if !shoe.workouts.isEmpty {
                 Section("Workouts") {
-                    ForEach(
-                        shoe.workouts.sorted(by: { $0.date > $1.date }).prefix(
-                            3
-                        )
-                    ) {
-                        workout in
+                    ForEach(recentWorkouts) { workout in
                         WorkoutRow(workout: workout)
                     }
 
-                    if shoe.workouts.count > 3 {
+                    if shoe.workouts.count > recentWorkouts.count {
                         NavigationLink(
                             destination:
                                 WorkoutsView(shoe: shoe)
@@ -157,7 +185,7 @@ struct ShoeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    viewModel?.toggleArchive()
+                    viewModel.toggleArchive()
                 } label: {
                     Label(
                         shoe.isArchived ? "Unarchive Shoe" : "Archive Shoe",
@@ -171,36 +199,27 @@ struct ShoeDetailView: View {
 
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") {
-                    showingEditSheet = true
+                    activeSheet = .editSheet
                 }
             }
 
             if !shoe.isArchived {
                 ToolbarItem(placement: .bottomBar) {
                     Button("Assign Workouts") {
-                        showingWorkoutPicker = true
+                        activeSheet = .workoutPicker
                     }
                 }
             }
         }
-        .sheet(isPresented: $showingWorkoutPicker) {
-            WorkoutPickerView(viewModel: viewModel)
-        }
-        .sheet(isPresented: $showingEditSheet) {
-            ShoeFormView(existingShoe: shoe) {
-                dismiss()
-            }
-        }
-        .onAppear {
-            if viewModel == nil {
-                let repository = ShoeRepository(modelContext: modelContext)
-                let healthKit = HealthKitManager()
+        .sheet(item: $activeSheet) { item in
+            switch item {
+            case .workoutPicker:
+                WorkoutPickerView(shoe: shoe, modelContext: modelContext)
 
-                viewModel = ShoeDetailViewModel(
-                    shoe: shoe,
-                    repository: repository,
-                    healthKitManager: healthKit
-                )
+            case .editSheet:
+                ShoeFormView(existingShoe: shoe) {
+                    dismiss()
+                }
             }
         }
     }

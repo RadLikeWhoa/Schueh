@@ -53,7 +53,10 @@ struct ArchiveListView: View {
                         ForEach(searchResults) { shoe in
                             NavigationLink(
                                 destination:
-                                    ShoeDetailView(shoe: shoe)
+                                    ShoeDetailView(
+                                        shoe: shoe,
+                                        modelContext: modelContext
+                                    )
                             ) {
                                 ShoeCard(shoe: shoe)
                             }
@@ -62,7 +65,10 @@ struct ArchiveListView: View {
                         ForEach(sortedShoes) { shoe in
                             NavigationLink(
                                 destination:
-                                    ShoeDetailView(shoe: shoe)
+                                    ShoeDetailView(
+                                        shoe: shoe,
+                                        modelContext: modelContext
+                                    )
                             ) {
                                 ShoeCard(shoe: shoe)
                             }
