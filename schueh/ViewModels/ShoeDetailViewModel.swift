@@ -33,8 +33,28 @@ class ShoeDetailViewModel {
 
             let assignedIds = try repository.allAssignedHealthKitIds()
             let allWorkouts = try await healthKitManager.fetchRunningWorkouts()
-            
-            availableWorkouts = allWorkouts.filter { !assignedIds.contains($0.uuid) }
+
+            let timeRangeRaw = UserDefaults.standard.string(forKey: "timeRange") ?? TimeRangeOption.days30.rawValue
+            let timeRange = TimeRangeOption(rawValue: timeRangeRaw) ?? .days30
+
+            let now = Date()
+            let filteredWorkouts: [HKWorkout]
+
+            switch timeRange {
+            case .days30:
+                let fromDate = Calendar.current.date(byAdding: .day, value: -30, to: now)!
+                filteredWorkouts = allWorkouts.filter { $0.startDate >= fromDate }
+            case .days90:
+                let fromDate = Calendar.current.date(byAdding: .day, value: -90, to: now)!
+                filteredWorkouts = allWorkouts.filter { $0.startDate >= fromDate }
+            case .days365:
+                let fromDate = Calendar.current.date(byAdding: .day, value: -365, to: now)!
+                filteredWorkouts = allWorkouts.filter { $0.startDate >= fromDate }
+            case .all:
+                filteredWorkouts = allWorkouts
+            }
+
+            availableWorkouts = filteredWorkouts.filter { !assignedIds.contains($0.uuid) }
 
         } catch {
             errorMessage =

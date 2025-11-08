@@ -49,13 +49,15 @@ struct ShoeDetailView: View {
                 ShoeProgress(shoe: shoe)
 
                 if shoe.isArchived {
-                    HStack(spacing: 16) {
-                        Image(systemName: "archivebox.fill")
-                            .foregroundStyle(.gray)
-
-                        Text("This shoe has been archived.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                    if let archived = shoe.archived {
+                        HStack(spacing: 16) {
+                            Image(systemName: "archivebox.fill")
+                                .foregroundStyle(.gray)
+                            
+                            Text("This shoe was archived on \(dateFormatter.string(from: archived)).")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 } else {
                     if shoe.hasExpired {
