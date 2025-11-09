@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct ShoeTrackerApp: App {
+struct SchuehApp: App {
     @AppStorage("appearance") private var appearance: Int = 0
 
     var appearanceSwitch: ColorScheme? {

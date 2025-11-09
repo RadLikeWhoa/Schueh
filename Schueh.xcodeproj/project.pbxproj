@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		CF1886BD2EBA043100C7E88A /* schueh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = schueh.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF1886BD2EBA043100C7E88A /* Schueh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Schueh.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		CF1886BF2EBA043100C7E88A /* schueh */ = {
+		CF1886BF2EBA043100C7E88A /* Schueh */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = schueh;
+			path = Schueh;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		CF1886B42EBA043100C7E88A = {
 			isa = PBXGroup;
 			children = (
-				CF1886BF2EBA043100C7E88A /* schueh */,
+				CF1886BF2EBA043100C7E88A /* Schueh */,
 				CF1886BE2EBA043100C7E88A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		CF1886BE2EBA043100C7E88A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CF1886BD2EBA043100C7E88A /* schueh.app */,
+				CF1886BD2EBA043100C7E88A /* Schueh.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CF1886BC2EBA043100C7E88A /* schueh */ = {
+		CF1886BC2EBA043100C7E88A /* Schueh */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CF1886E02EBA043300C7E88A /* Build configuration list for PBXNativeTarget "schueh" */;
+			buildConfigurationList = CF1886E02EBA043300C7E88A /* Build configuration list for PBXNativeTarget "Schueh" */;
 			buildPhases = (
 				CF1886B92EBA043100C7E88A /* Sources */,
 				CF1886BA2EBA043100C7E88A /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				CF1886BF2EBA043100C7E88A /* schueh */,
+				CF1886BF2EBA043100C7E88A /* Schueh */,
 			);
-			name = schueh;
+			name = Schueh;
 			packageProductDependencies = (
 			);
 			productName = schueh;
-			productReference = CF1886BD2EBA043100C7E88A /* schueh.app */;
+			productReference = CF1886BD2EBA043100C7E88A /* Schueh.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = CF1886B82EBA043100C7E88A /* Build configuration list for PBXProject "schueh" */;
+			buildConfigurationList = CF1886B82EBA043100C7E88A /* Build configuration list for PBXProject "Schueh" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CF1886BC2EBA043100C7E88A /* schueh */,
+				CF1886BC2EBA043100C7E88A /* Schueh */,
 			);
 		};
 /* End PBXProject section */
@@ -315,7 +315,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CF1886B82EBA043100C7E88A /* Build configuration list for PBXProject "schueh" */ = {
+		CF1886B82EBA043100C7E88A /* Build configuration list for PBXProject "Schueh" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CF1886DE2EBA043300C7E88A /* Debug */,
@@ -324,7 +324,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CF1886E02EBA043300C7E88A /* Build configuration list for PBXNativeTarget "schueh" */ = {
+		CF1886E02EBA043300C7E88A /* Build configuration list for PBXNativeTarget "Schueh" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CF1886E12EBA043300C7E88A /* Debug */,

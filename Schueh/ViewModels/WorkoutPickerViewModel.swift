@@ -80,7 +80,7 @@ class WorkoutPickerViewModel {
             }
 
             availableWorkouts = filteredWorkouts.filter {
-                !assignedIds.contains($0.uuid)
+                $0.startDate > shoe.purchased && !assignedIds.contains($0.uuid)
             }
         } catch {
             errorMessage =

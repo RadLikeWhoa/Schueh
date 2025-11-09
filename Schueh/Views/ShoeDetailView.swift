@@ -121,10 +121,10 @@ struct ShoeDetailView: View {
                 }
             }
 
-            Section("Statistics") {
-                LabeledContent("Runs", value: "\(shoe.numberOfRuns)")
+            if shoe.numberOfRuns > 0 {
+                Section("Statistics") {
+                    LabeledContent("Runs", value: "\(shoe.numberOfRuns)")
 
-                if shoe.numberOfRuns > 0 {
                     LabeledContent("Avg. per Run") {
                         Text("\(shoe.averageKmPerRun, specifier: "%.2f") km")
                     }
@@ -143,6 +143,10 @@ struct ShoeDetailView: View {
                         LabeledContent("Total Elevation Gain") {
                             Text("\(totalElevationGain, specifier: "%.2f") m")
                         }
+                    }
+
+                    NavigationLink(destination: InsightsView(shoe: shoe)) {
+                        Text("View More Insights")
                     }
                 }
             }

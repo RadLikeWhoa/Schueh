@@ -25,20 +25,17 @@ struct ShoeFormView: View {
             Form {
                 Section("Details") {
                     TextField("Name", text: $name)
-
+                    
                     TextField("Color", text: $color)
-
+                    
                     DatePicker(
                         "Purchased",
-                        selection: Binding<Date>(
-                            get: { self.purchased },
-                            set: { self.purchased = $0 }
-                        ),
+                        selection: $purchased,
                         in: Date.distantPast...Date(),
                         displayedComponents: [.date]
                     )
                 }
-
+                
                 Section("Target Mileage") {
                     HStack(spacing: 16) {
                         TextField(
@@ -50,12 +47,12 @@ struct ShoeFormView: View {
                         .alignmentGuide(.listRowSeparatorLeading) {
                             $0[.leading]
                         }
-
+                        
                         Text("km")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-
+                    
                     Text(
                         "Enter your target mileage for this shoe. As a rule of thumb, most running shoes aim for around 500 - 800 km."
                     )
@@ -113,12 +110,12 @@ struct ShoeFormView: View {
             }
         }
     }
-    
-   private func delete() throws {
-       guard let shoe = existingShoe else { return }
-       
-       modelContext.delete(shoe)
-       try modelContext.save()
+
+    private func delete() throws {
+        guard let shoe = existingShoe else { return }
+
+        modelContext.delete(shoe)
+        try modelContext.save()
     }
 
     private func saveShoe() {
