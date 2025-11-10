@@ -8,21 +8,18 @@ final class WorkoutRecord {
     var date: Date
     var distanceKm: Double
     var duration: TimeInterval
-    var elevationGain: Double?
     var shoe: Shoe?
 
     init(
         healthKitId: UUID,
         date: Date,
         distanceKm: Double,
-        duration: TimeInterval,
-        elevationGain: Double?
+        duration: TimeInterval
     ) {
         self.id = UUID()
         self.healthKitId = healthKitId
         self.date = date
         self.distanceKm = distanceKm
         self.duration = duration
-        self.elevationGain = elevationGain
     }
 }

@@ -33,34 +33,11 @@ final class InsightsViewModel: ObservableObject {
         var result: [(Date, Double)] = []
 
         for workout in sortedWorkouts {
-            total += workout.distanceKm
+            total += max(0, workout.distanceKm)
+            
             result.append(
                 (Calendar.current.startOfDay(for: workout.date), total)
             )
-        }
-
-        if let first = result.first, first.0 > purchaseDate {
-            result.insert((date: purchaseDate, total: 0), at: 0)
-        }
-
-        if let last = result.last, last.0 < endDate {
-            result.append((date: endDate, total: total))
-        }
-
-        return result
-    }
-
-    var cumulativeElevationGain: [(date: Date, total: Double)] {
-        var total: Double = 0
-        var result: [(Date, Double)] = []
-
-        for workout in sortedWorkouts {
-            if let elevationGain = workout.elevationGain {
-                total += elevationGain
-                result.append(
-                    (Calendar.current.startOfDay(for: workout.date), total)
-                )
-            }
         }
 
         if let first = result.first, first.0 > purchaseDate {

@@ -32,7 +32,7 @@ struct WorkoutPickerView: View {
                         "No Workouts Found",
                         systemImage: "figure.run",
                         description: Text(
-                            "No running workouts found in Apple Health."
+                            "No running workouts found in Apple Health that are not yet assigned to a shoe."
                         )
                     )
                 } else {

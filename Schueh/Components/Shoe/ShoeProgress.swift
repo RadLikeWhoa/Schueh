@@ -16,36 +16,57 @@ struct ShoeProgress: View {
             return .yellow
         }
         
-        return .blue
+        return .green
     }
 
     private let capsule = Capsule()
 
     var body: some View {
-        ZStack(alignment: .center) {
-            capsule
-                .fill(.foreground.quaternary)
-                .overlay(alignment: .leading) {
-                    GeometryReader { proxy in
-                        capsule
-                            .fill(color)
-                            .frame(width: proxy.size.width * (shoe.progress / 100), height: 12)
-                        
+        HStack(alignment: .center, spacing: 12) {
+            ZStack(alignment: .center) {
+                capsule
+                    .fill(.foreground.quaternary)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { proxy in
+                            capsule
+                                .fill(color)
+                                .frame(width: proxy.size.width * (shoe.progress / 100), height: 12)
+                            
+                        }
                     }
-                }
-                .frame(height: 12)
-                .clipShape(capsule)
-            
-            if shoe.isArchived || shoe.hasExpired || shoe.closeToExpiration {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.background)
-                    .frame(width: 32, height: 16)
+                    .frame(height: 12)
+                    .clipShape(capsule)
                 
-                Image(systemName: shoe.isArchived ? "archivebox.fill" : "exclamationmark.triangle.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(color)
+                if shoe.isArchived || shoe.hasExpired || shoe.closeToExpiration {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.background)
+                        .frame(width: 32, height: 16)
+                    
+                    Image(systemName: shoe.isArchived ? "archivebox.fill" : "exclamationmark.triangle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(color)
+                }
             }
+            .frame(height: 16)
+            
+            Text("\(shoe.progress, specifier: "%.0f")%")
+                .font(.subheadline)
+                .foregroundStyle(color)
+                .bold()
         }
-        .frame(height: 16)
+        .alignmentGuide(.listRowSeparatorLeading) {
+            $0[.leading]
+        }
+    }
+}
+
+#Preview {
+    List {
+        ShoeProgress(shoe: Shoe(
+            name: "Test",
+            targetDistance: 500,
+            color: "White",
+            purchased: .now
+        ))
     }
 }

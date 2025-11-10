@@ -24,7 +24,6 @@ class ShoeRepository {
         date: Date,
         distanceKm: Double,
         duration: TimeInterval,
-        elevationGain: Double?,
         to shoe: Shoe
     ) throws {
         let descriptor = FetchDescriptor<WorkoutRecord>(
@@ -38,8 +37,7 @@ class ShoeRepository {
                 healthKitId: healthKitId,
                 date: date,
                 distanceKm: distanceKm,
-                duration: duration,
-                elevationGain: elevationGain
+                duration: duration
             )
             
             workout.shoe = shoe

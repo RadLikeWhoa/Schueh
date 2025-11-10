@@ -9,6 +9,7 @@ struct ShoeFormView: View {
     @State private var color = ""
     @State private var targetDistance: Int?
     @State private var purchased = Date()
+    @State private var archived: Date?
     @State private var showingDeleteAlert = false
 
     var existingShoe: Shoe?
@@ -20,22 +21,41 @@ struct ShoeFormView: View {
         return formatter
     }()
 
+    @AppStorage("unitPreference") private var unitPreferenceRaw: String =
+        UnitOption.system.rawValue
+
+    private var unitPreference: UnitOption {
+        UnitOption(rawValue: unitPreferenceRaw) ?? .system
+    }
+
     var body: some View {
         NavigationStack {
             Form {
                 Section("Details") {
                     TextField("Name", text: $name)
-                    
+
                     TextField("Color", text: $color)
-                    
+
                     DatePicker(
                         "Purchased",
                         selection: $purchased,
                         in: Date.distantPast...Date(),
                         displayedComponents: [.date]
                     )
+
+                    if archived != nil {
+                        DatePicker(
+                            "Archived",
+                            selection: Binding<Date>(
+                                get: { self.archived ?? Date() },
+                                set: { self.archived = $0 }
+                            ),
+                            in: purchased...Date(),
+                            displayedComponents: [.date]
+                        )
+                    }
                 }
-                
+
                 Section("Target Mileage") {
                     HStack(spacing: 16) {
                         TextField(
@@ -47,12 +67,12 @@ struct ShoeFormView: View {
                         .alignmentGuide(.listRowSeparatorLeading) {
                             $0[.leading]
                         }
-                        
-                        Text("km")
+
+                        Text(unitPreference.distanceUnit)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     Text(
                         "Enter your target mileage for this shoe. As a rule of thumb, most running shoes aim for around 500 - 800 km."
                     )
@@ -73,7 +93,10 @@ struct ShoeFormView: View {
                     Button("Save", systemImage: "checkmark") {
                         saveShoe()
                     }
-                    .disabled(name.isEmpty || targetDistance == nil)
+                    .disabled(
+                        name.isEmpty || targetDistance == nil
+                            || targetDistance! <= 0
+                    )
                 }
 
                 if existingShoe != nil {
@@ -104,8 +127,15 @@ struct ShoeFormView: View {
                 if let shoe = existingShoe {
                     name = shoe.name
                     color = shoe.color ?? ""
-                    targetDistance = shoe.targetDistance
+
+                    targetDistance = Int(
+                        unitPreference.convertDistanceToKilometers(
+                            distance: Double(shoe.targetDistance)
+                        )
+                    )
+
                     purchased = shoe.purchased
+                    archived = shoe.archived
                 }
             }
         }
@@ -121,13 +151,24 @@ struct ShoeFormView: View {
     private func saveShoe() {
         if let existingShoe = existingShoe {
             existingShoe.name = name
-            existingShoe.targetDistance = targetDistance ?? 0
+
+            existingShoe.targetDistance = Int(
+                unitPreference.convertDistanceToKilometers(
+                    distance: Double(targetDistance ?? 0)
+                )
+            )
+
             existingShoe.color = color.isEmpty ? nil : color
             existingShoe.purchased = purchased
+            existingShoe.archived = archived
         } else {
             let shoe = Shoe(
                 name: name,
-                targetDistance: targetDistance ?? 0,
+                targetDistance: Int(
+                    unitPreference.convertDistanceToKilometers(
+                        distance: Double(targetDistance ?? 0)
+                    )
+                ),
                 archived: nil,
                 color: color.isEmpty ? nil : color,
                 purchased: purchased

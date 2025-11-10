@@ -18,7 +18,6 @@ final class Shoe {
         name: String,
         targetDistance: Int,
         archived: Date? = nil,
-        version: String? = nil,
         color: String? = nil,
         purchased: Date,
     ) {
@@ -32,21 +31,25 @@ final class Shoe {
     }
 
     var totalKilometers: Double {
-        workouts.reduce(0) { $0 + $1.distanceKm }
+        max(0, workouts.reduce(0) { $0 + $1.distanceKm })
+    }
+
+    var totalDuration: Double {
+        max(0, workouts.reduce(0) { $0 + $1.duration })
     }
 
     var numberOfRuns: Int {
         workouts.count
     }
 
-    var averageKmPerRun: Double {
-        guard numberOfRuns > 0 else { return 0 }
+    var averageKmPerRun: Double? {
+        guard numberOfRuns > 0 else { return nil }
         return totalKilometers / Double(numberOfRuns)
     }
 
-    var averageKmPerWeek: Double {
+    var averageKmPerWeek: Double? {
         guard let firstWorkout = workouts.min(by: { $0.date < $1.date }) else {
-            return 0
+            return nil
         }
 
         let weeksSinceFirst =
@@ -60,21 +63,16 @@ final class Shoe {
 
         return totalKilometers / Double(weeksSinceFirst)
     }
-    
+
     var age: Int? {
-        return Calendar.current.dateComponents(
+        let age = Calendar.current.dateComponents(
             [.day],
             from: purchased,
             to: archived ?? Date()
         ).day
-    }
-
-    var totalElevationGain: Double? {
-        guard workouts.contains(where: { $0.elevationGain != nil }) else {
-            return nil
-        }
         
-        return workouts.reduce(0) { $0 + Double($1.elevationGain ?? 0) }
+        guard age != nil, age! > 0 else { return 0 }
+        return age
     }
 
     var lastWorkoutDate: Date? {
@@ -89,24 +87,24 @@ final class Shoe {
     var remainder: Double {
         max(Double(targetDistance) - totalKilometers, 0)
     }
-    
+
     var maximumDistance: Double? {
         workouts.max(by: { $0.distanceKm < $1.distanceKm })?.distanceKm
     }
-    
+
     var daysRemaining: Int? {
-        guard averageKmPerWeek > 0 else { return nil }
-        return Int(ceil(remainder / averageKmPerWeek * 7))
+        guard averageKmPerWeek != nil, averageKmPerWeek! > 0 else { return nil }
+        return Int(ceil(remainder / averageKmPerWeek! * 7))
     }
-    
+
     var hasExpired: Bool {
         remainder <= 0
     }
-    
+
     var closeToExpiration: Bool {
-        progress > 80 && !hasExpired
+        progress >= 80
     }
-    
+
     var isArchived: Bool {
         archived != nil
     }

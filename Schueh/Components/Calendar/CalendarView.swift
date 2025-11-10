@@ -52,6 +52,7 @@ struct CalendarView: View {
                             .foregroundStyle(.tint)
                     }
                     .accessibilityLabel("Next Month")
+                    .disabled(Calendar.current.isDate(month, equalTo: .now, toGranularity: .month))
                 }
                 .buttonStyle(.plain)
             }
@@ -143,4 +144,8 @@ struct CalendarView: View {
     private func isDateHighlighted(_ date: Date) -> Bool {
         highlightedDates.contains { calendar.isDate($0, inSameDayAs: date) }
     }
+}
+
+#Preview {
+    CalendarView(month: .now, highlightedDates: [.now])
 }

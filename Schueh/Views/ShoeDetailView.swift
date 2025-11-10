@@ -7,18 +7,13 @@ struct ShoeDetailView: View {
 
     let shoe: Shoe
 
-    @State private var viewModel: ShoeDetailViewModel
-
     enum ActiveSheet: Identifiable {
         case workoutPicker, editSheet
 
         var id: Int {
             switch self {
-            case .workoutPicker:
-                return 0
-
-            case .editSheet:
-                return 1
+            case .workoutPicker: return 0
+            case .editSheet: return 1
             }
         }
     }
@@ -26,9 +21,7 @@ struct ShoeDetailView: View {
     @State private var activeSheet: ActiveSheet?
 
     private var recentWorkouts: ArraySlice<WorkoutRecord> {
-        shoe.workouts.sorted(by: { $0.date > $1.date }).prefix(
-            3
-        )
+        shoe.workouts.sorted(by: { $0.date > $1.date }).prefix(3)
     }
 
     private let dateFormatter: DateFormatter = {
@@ -37,38 +30,74 @@ struct ShoeDetailView: View {
         return formatter
     }()
 
-    init(shoe: Shoe, modelContext: ModelContext) {
-        self.shoe = shoe
+    @AppStorage("unitPreference") private var unitPreferenceRaw: String =
+        UnitOption.system.rawValue
 
-        _viewModel = State(
-            initialValue: ShoeDetailViewModel(
-                shoe: shoe,
-                repository: ShoeRepository(modelContext: modelContext)
-            )
-        )
+    private var unitPreference: UnitOption {
+        UnitOption(rawValue: unitPreferenceRaw) ?? .system
+    }
+    
+    init(shoe: Shoe) {
+        self.shoe = shoe
+    }
+
+    private var formattedDuration: LocalizedStringKey {
+        var seconds = Int(shoe.totalDuration)
+
+        let days = seconds / (24 * 3600)
+        seconds %= 24 * 3600
+
+        let hours = seconds / 3600
+        seconds %= 3600
+
+        let minutes = seconds / 60
+        seconds %= 60
+        
+        if days > 0 {
+            if hours > 0 {
+                return "^[\(days) day](inflect: true) ^[\(hours) hour](inflect: true)"
+            }
+            
+            return "^[\(days) day](inflect: true)"
+        }
+        
+        if hours > 0 {
+            if minutes > 0 {
+                return "^[\(hours) hour](inflect: true) ^[\(minutes) minute](inflect: true)"
+            }
+            
+            return "^[\(hours) hour](inflect: true)"
+        }
+        
+        return "^[\(minutes) minute](inflect: true)"
     }
 
     var body: some View {
         List {
             Section {
-                LabeledContent("Total Distance") {
-                    Text("\(shoe.totalKilometers, specifier: "%.2f") km")
-                }
-
                 LabeledContent("Target Distance") {
-                    Text("\(shoe.targetDistance) km")
+                    Text(
+                        unitPreference.formatDistance(
+                            Double(shoe.targetDistance),
+                            fractionDigits: 0
+                        )
+                    )
+                }
+                
+                LabeledContent("Total Distance") {
+                    Text(unitPreference.formatDistance(shoe.totalKilometers))
                 }
 
                 if !shoe.isArchived {
                     if shoe.remainder > 0 {
-                        LabeledContent("Remaining") {
+                        LabeledContent("Distance Remaining") {
                             Text(
-                                "\(shoe.remainder, specifier: "%.2f") km • \(100 - shoe.progress, specifier: "%.2f")%"
+                                "\(unitPreference.formatDistance(shoe.remainder))"
                             )
                         }
                     }
 
-                    if let daysRemaining = shoe.daysRemaining {
+                    if let daysRemaining = shoe.daysRemaining, daysRemaining > 0 {
                         LabeledContent("Days Remaining") {
                             Text(
                                 "^[\(daysRemaining) day](inflect: true)"
@@ -106,7 +135,7 @@ struct ShoeDetailView: View {
                         }
                     }
 
-                    if shoe.closeToExpiration {
+                    if shoe.closeToExpiration && !shoe.hasExpired {
                         HStack(spacing: 16) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundStyle(.yellow)
@@ -124,24 +153,30 @@ struct ShoeDetailView: View {
             if shoe.numberOfRuns > 0 {
                 Section("Statistics") {
                     LabeledContent("Runs", value: "\(shoe.numberOfRuns)")
-
-                    LabeledContent("Avg. per Run") {
-                        Text("\(shoe.averageKmPerRun, specifier: "%.2f") km")
+                    
+                    LabeledContent("Time in Shoe") {
+                        Text(formattedDuration)
                     }
 
-                    LabeledContent("Avg. per Week") {
-                        Text("\(shoe.averageKmPerWeek, specifier: "%.2f") km")
+                    if let averageKmPerRun = shoe.averageKmPerRun {
+                        LabeledContent("Avg. Distance per Run") {
+                            Text(
+                                unitPreference.formatDistance(averageKmPerRun)
+                            )
+                        }
+                    }
+
+                    if let averageKmPerWeek = shoe.averageKmPerWeek {
+                        LabeledContent("Avg. Distance per Week") {
+                            Text(
+                                unitPreference.formatDistance(averageKmPerWeek)
+                            )
+                        }
                     }
 
                     if let maximumDistance = shoe.maximumDistance {
                         LabeledContent("Longest Run") {
-                            Text("\(maximumDistance, specifier: "%.2f") km")
-                        }
-                    }
-
-                    if let totalElevationGain = shoe.totalElevationGain {
-                        LabeledContent("Total Elevation Gain") {
-                            Text("\(totalElevationGain, specifier: "%.2f") m")
+                            Text(unitPreference.formatDistance(maximumDistance))
                         }
                     }
 
@@ -175,8 +210,7 @@ struct ShoeDetailView: View {
 
                     if shoe.workouts.count > recentWorkouts.count {
                         NavigationLink(
-                            destination:
-                                WorkoutsView(shoe: shoe)
+                            destination: WorkoutsView(shoe: shoe)
                         ) {
                             Text("Show All Workouts")
                         }
@@ -189,7 +223,7 @@ struct ShoeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    viewModel.toggleArchive()
+                    toggleArchive()
                 } label: {
                     Label(
                         shoe.isArchived ? "Unarchive Shoe" : "Archive Shoe",
@@ -227,4 +261,10 @@ struct ShoeDetailView: View {
             }
         }
     }
+    
+    private func toggleArchive() {
+        let repository = ShoeRepository(modelContext: modelContext)
+        try? repository.toggleArchive(shoe)
+    }
 }
+

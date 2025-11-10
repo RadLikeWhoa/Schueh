@@ -40,7 +40,6 @@ struct WorkoutsView: View {
                     }
                 }
             }
-            .contentMargins(.top, 16)
             .navigationTitle("Workouts")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(editMode?.wrappedValue.isEditing == true)

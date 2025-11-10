@@ -6,6 +6,15 @@ struct InsightsView: View {
 
     @State private var currentMonth = Date()
 
+    @AppStorage("unitPreference") private var unitPreferenceRaw: String =
+        UnitOption.system.rawValue
+
+    @AppStorage("showTargetLine") private var showTargetLine: Bool = true
+
+    private var unitPreference: UnitOption {
+        UnitOption(rawValue: unitPreferenceRaw) ?? .system
+    }
+
     init(shoe: Shoe) {
         _viewModel = StateObject(wrappedValue: InsightsViewModel(shoe: shoe))
     }
@@ -17,29 +26,55 @@ struct InsightsView: View {
                     ForEach(viewModel.cumulativeMileage, id: \.date) { point in
                         LineMark(
                             x: .value("Date", point.date),
-                            y: .value("Cumulative Km", point.total)
+                            y: .value(
+                                "Cumulative \(unitPreference.distanceUnit)",
+                                unitPreference.convertDistance(
+                                    kilometers: point.total
+                                )
+                            )
                         )
                         .symbol {
                             Circle()
                                 .fill(.tint)
                                 .frame(height: 5)
                         }
-                        
-                        RuleMark(y: .value("Target", viewModel.shoe.targetDistance))
+
+                        if showTargetLine {
+                            RuleMark(
+                                y: .value(
+                                    "Target",
+                                    Int(
+                                        unitPreference.convertDistance(
+                                            kilometers: Double(
+                                                viewModel.shoe.targetDistance
+                                            )
+                                        )
+                                    )
+                                )
+                            )
                             .foregroundStyle(.gray)
                             .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 5]))
                             .annotation(position: .top, alignment: .trailing) {
-                                Text("Target: \(viewModel.shoe.targetDistance) km")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
+                                Text(
+                                    "Target: \(unitPreference.formatDistance(Double(viewModel.shoe.targetDistance), fractionDigits: 0))"
+                                )
+                                .font(.caption)
+                                .foregroundColor(.gray)
                             }
+                        }
                     }
                 }
                 .frame(height: 180)
-                
+
                 LabeledContent("Total Distance") {
-                    Text("\(viewModel.shoe.totalKilometers, specifier: "%.2f") km")
+                    Text(
+                        unitPreference.formatDistance(
+                            viewModel.shoe.totalKilometers
+                        )
+                    )
                 }
+
+                Toggle("Show Target", isOn: $showTargetLine)
             }
 
             Section("Distance per Week") {
@@ -47,7 +82,12 @@ struct InsightsView: View {
                     ForEach(viewModel.mileagePerWeek, id: \.week) { entry in
                         LineMark(
                             x: .value("Week", entry.week),
-                            y: .value("Km", entry.total)
+                            y: .value(
+                                unitPreference.distanceUnit,
+                                unitPreference.convertDistance(
+                                    kilometers: entry.total
+                                )
+                            )
                         )
                         .symbol {
                             Circle()
@@ -57,31 +97,12 @@ struct InsightsView: View {
                     }
                 }
                 .frame(height: 180)
-                
-                LabeledContent("Avg. per Week") {
-                    Text("\(viewModel.shoe.averageKmPerWeek, specifier: "%.2f") km")
-                }
-            }
-            
-            if let totalElevationGain = viewModel.shoe.totalElevationGain {
-                Section("Total Elevation Gain") {
-                    Chart {
-                        ForEach(viewModel.cumulativeElevationGain, id: \.date) { point in
-                            LineMark(
-                                x: .value("Date", point.date),
-                                y: .value("Cumulative Elevation Gain", point.total)
-                            )
-                            .symbol {
-                                Circle()
-                                    .fill(.tint)
-                                    .frame(height: 5)
-                            }
-                        }
-                    }
-                    .frame(height: 180)
-                    
-                    LabeledContent("Total Elevaion Gain") {
-                        Text("\(totalElevationGain, specifier: "%.2f") m")
+
+                if let averageKmPerWeek = viewModel.shoe.averageKmPerWeek {
+                    LabeledContent("Avg. per Week") {
+                        Text(
+                            unitPreference.formatDistance(averageKmPerWeek)
+                        )
                     }
                 }
             }

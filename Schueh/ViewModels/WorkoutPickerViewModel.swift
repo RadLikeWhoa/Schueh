@@ -97,8 +97,6 @@ class WorkoutPickerViewModel {
                 date: workout.startDate,
                 distanceKm: distance.doubleValue(for: .meterUnit(with: .kilo)),
                 duration: workout.duration,
-                elevationGain: workout.metadata?[HKMetadataKeyElevationAscended]
-                    as? Double,
                 to: shoe
             )
         } catch {

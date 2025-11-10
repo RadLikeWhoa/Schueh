@@ -27,7 +27,7 @@ struct ArchiveListView: View {
 
         switch sortOption {
         case .age:
-            result.sort { $0.purchased < $1.purchased }
+            result.sort { $0.purchased > $1.purchased }
 
         case .name:
             result.sort { $0.name < $1.name }
@@ -53,10 +53,7 @@ struct ArchiveListView: View {
                         ForEach(searchResults) { shoe in
                             NavigationLink(
                                 destination:
-                                    ShoeDetailView(
-                                        shoe: shoe,
-                                        modelContext: modelContext
-                                    )
+                                    ShoeDetailView(shoe: shoe)
                             ) {
                                 ShoeCard(shoe: shoe)
                             }
@@ -65,10 +62,7 @@ struct ArchiveListView: View {
                         ForEach(sortedShoes) { shoe in
                             NavigationLink(
                                 destination:
-                                    ShoeDetailView(
-                                        shoe: shoe,
-                                        modelContext: modelContext
-                                    )
+                                    ShoeDetailView(shoe: shoe)
                             ) {
                                 ShoeCard(shoe: shoe)
                             }
