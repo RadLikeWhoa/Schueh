@@ -98,11 +98,11 @@ final class Shoe {
     }
 
     var hasExpired: Bool {
-        remainder <= 0
+        progress >= 100
     }
 
     var closeToExpiration: Bool {
-        progress >= 80
+        85 ... 100 ~= progress
     }
 
     var isArchived: Bool {
