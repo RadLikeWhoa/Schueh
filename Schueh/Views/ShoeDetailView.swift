@@ -121,31 +121,27 @@ struct ShoeDetailView: View {
                             .foregroundStyle(.secondary)
                         }
                     }
-                } else {
-                    if shoe.hasExpired {
-                        HStack(spacing: 16) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.red)
+                } else if shoe.hasExpired {
+                    HStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
 
-                            Text(
-                                "This shoe has reached its mileage limit. Consider archiving it or looking for a replacement."
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        }
+                        Text(
+                            "This shoe has reached its mileage limit. Consider archiving it or looking for a replacement."
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                     }
+                } else if shoe.closeToExpiration {
+                    HStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.yellow)
 
-                    if shoe.closeToExpiration && !shoe.hasExpired {
-                        HStack(spacing: 16) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.yellow)
-
-                            Text(
-                                "This shoe is about to reach its mileage limit. Consider looking for a replacement."
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        }
+                        Text(
+                            "This shoe is about to reach its mileage limit. Consider looking for a replacement."
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                     }
                 }
             }

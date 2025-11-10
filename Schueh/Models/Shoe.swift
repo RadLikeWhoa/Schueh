@@ -102,7 +102,7 @@ final class Shoe {
     }
 
     var closeToExpiration: Bool {
-        85 ... 100 ~= progress
+        progress >= 85
     }
 
     var isArchived: Bool {
