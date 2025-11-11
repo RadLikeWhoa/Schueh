@@ -70,7 +70,7 @@ final class Shoe {
             from: purchased,
             to: archived ?? Date()
         ).day
-        
+
         guard age != nil, age! > 0 else { return 0 }
         return age
     }
@@ -107,5 +107,18 @@ final class Shoe {
 
     var isArchived: Bool {
         archived != nil
+    }
+
+    var averageDurationBetweenRuns: Double? {
+        let sorted = workouts.sorted(by: { $0.date < $1.date })
+        guard sorted.count >= 2 else { return nil }
+
+        let intervals = zip(sorted.dropFirst(), sorted).map {
+            $0.date.timeIntervalSince($1.date)
+        }
+        
+        let totalInterval = intervals.reduce(0, +)
+
+        return totalInterval / Double(intervals.count)
     }
 }

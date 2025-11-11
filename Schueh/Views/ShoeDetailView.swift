@@ -36,40 +36,9 @@ struct ShoeDetailView: View {
     private var unitPreference: UnitOption {
         UnitOption(rawValue: unitPreferenceRaw) ?? .system
     }
-    
+
     init(shoe: Shoe) {
         self.shoe = shoe
-    }
-
-    private var formattedDuration: LocalizedStringKey {
-        var seconds = Int(shoe.totalDuration)
-
-        let days = seconds / (24 * 3600)
-        seconds %= 24 * 3600
-
-        let hours = seconds / 3600
-        seconds %= 3600
-
-        let minutes = seconds / 60
-        seconds %= 60
-        
-        if days > 0 {
-            if hours > 0 {
-                return "^[\(days) day](inflect: true) ^[\(hours) hour](inflect: true)"
-            }
-            
-            return "^[\(days) day](inflect: true)"
-        }
-        
-        if hours > 0 {
-            if minutes > 0 {
-                return "^[\(hours) hour](inflect: true) ^[\(minutes) minute](inflect: true)"
-            }
-            
-            return "^[\(hours) hour](inflect: true)"
-        }
-        
-        return "^[\(minutes) minute](inflect: true)"
     }
 
     var body: some View {
@@ -83,7 +52,7 @@ struct ShoeDetailView: View {
                         )
                     )
                 }
-                
+
                 LabeledContent("Total Distance") {
                     Text(unitPreference.formatDistance(shoe.totalKilometers))
                 }
@@ -97,7 +66,8 @@ struct ShoeDetailView: View {
                         }
                     }
 
-                    if let daysRemaining = shoe.daysRemaining, daysRemaining > 0 {
+                    if let daysRemaining = shoe.daysRemaining, daysRemaining > 0
+                    {
                         LabeledContent("Days Remaining") {
                             Text(
                                 "^[\(daysRemaining) day](inflect: true)"
@@ -149,9 +119,9 @@ struct ShoeDetailView: View {
             if shoe.numberOfRuns > 0 {
                 Section("Statistics") {
                     LabeledContent("Runs", value: "\(shoe.numberOfRuns)")
-                    
+
                     LabeledContent("Time in Shoe") {
-                        Text(formattedDuration)
+                        Text(formatDuration(duration: shoe.totalDuration))
                     }
 
                     if let averageKmPerRun = shoe.averageKmPerRun {
@@ -173,6 +143,19 @@ struct ShoeDetailView: View {
                     if let maximumDistance = shoe.maximumDistance {
                         LabeledContent("Longest Run") {
                             Text(unitPreference.formatDistance(maximumDistance))
+                        }
+                    }
+
+                    if let averageDurationBetweenRuns = shoe
+                        .averageDurationBetweenRuns
+                    {
+                        LabeledContent("Avg. Frequency of Use") {
+                            Text(
+                                formatDuration(
+                                    duration: averageDurationBetweenRuns,
+                                    maximumUnits: 1
+                                )
+                            )
                         }
                     }
 
@@ -257,10 +240,44 @@ struct ShoeDetailView: View {
             }
         }
     }
-    
+
     private func toggleArchive() {
         let repository = ShoeRepository(modelContext: modelContext)
         try? repository.toggleArchive(shoe)
     }
-}
 
+    private func formatDuration(duration: Double, maximumUnits: Int? = 2)
+        -> LocalizedStringKey
+    {
+        var seconds = Int(duration)
+
+        let days = seconds / (24 * 3600)
+        seconds %= 24 * 3600
+
+        let hours = seconds / 3600
+        seconds %= 3600
+
+        let minutes = seconds / 60
+        seconds %= 60
+
+        if days > 0 {
+            if hours > 0 && maximumUnits == 2 {
+                return
+                    "^[\(days) day](inflect: true) ^[\(hours) hour](inflect: true)"
+            }
+
+            return "^[\(days) day](inflect: true)"
+        }
+
+        if hours > 0 {
+            if minutes > 0 && maximumUnits == 2 {
+                return
+                    "^[\(hours) hour](inflect: true) ^[\(minutes) minute](inflect: true)"
+            }
+
+            return "^[\(hours) hour](inflect: true)"
+        }
+
+        return "^[\(minutes) minute](inflect: true)"
+    }
+}

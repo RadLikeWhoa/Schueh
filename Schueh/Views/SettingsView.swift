@@ -17,37 +17,40 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Picker(selection: $appearanceSelection) {
-                Text("System")
-                    .tag(0)
-                Text("Light")
-                    .tag(1)
-                Text("Dark")
-                    .tag(2)
-            } label: {
-                Text("Appearance")
-            }
-            .pickerStyle(.menu)
-
-            Picker(selection: $timeRangeSelection) {
-                ForEach(TimeRangeOption.allCases) { option in
-                    Text(option.rawValue)
-                        .tag(option.rawValue)
+            Section("Display") {
+                Picker(selection: $appearanceSelection) {
+                    Text("System")
+                        .tag(0)
+                    Text("Light")
+                        .tag(1)
+                    Text("Dark")
+                        .tag(2)
+                } label: {
+                    Text("Appearance")
                 }
-            } label: {
-                Text("Limit Workouts")
-            }
-            .pickerStyle(.menu)
-
-            Picker("Units", selection: $unitPreferenceRaw) {
-                ForEach(UnitOption.allCases) { unit in
-                    Text(unit.rawValue)
-                        .tag(unit.rawValue)
+                .pickerStyle(.menu)
+                
+                Picker("Units", selection: $unitPreferenceRaw) {
+                    ForEach(UnitOption.allCases) { unit in
+                        Text(unit.rawValue)
+                            .tag(unit.rawValue)
+                    }
                 }
+                .pickerStyle(.menu)
             }
-            .pickerStyle(.menu)
+            
+            Section("Workout Import") {
+                Picker(selection: $timeRangeSelection) {
+                    ForEach(TimeRangeOption.allCases) { option in
+                        Text(option.rawValue)
+                            .tag(option.rawValue)
+                    }
+                } label: {
+                    Text("Limit Workouts")
+                }
+                .pickerStyle(.menu)
+            }
         }
-        .contentMargins(.top, 16)
         .navigationTitle("Settings")
     }
 }
